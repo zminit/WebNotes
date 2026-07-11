@@ -1,1 +1,4 @@
 .webnotes-server.log
+node_modules/
+dist/
+.cc-connect/
