@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { BlockMath, InlineMath } from 'react-katex';
 import ThreeScene from './ThreeScene';
+import GaussianLab from './GaussianLab';
 
-type Note = 'nerf' | 'ml' | 'graphics' | 'home';
+type Note = 'nerf' | 'gs' | 'ml' | 'graphics' | 'home';
 const outline = [
   ['01', '问题：新视角合成'], ['02', '场表示：5D NeRF'], ['03', '网络结构与维度'], ['04', '体渲染'],
   ['05', '训练与层级采样'], ['06', '实验、贡献与局限'],
@@ -15,18 +16,18 @@ export default function App() {
       <button className="logo" onClick={() => { setOpen('rendering'); setNote('home'); }}><span>W</span> WebNotes</button>
       <nav className="catalog" aria-label="知识栏目">
         <NavGroup title="机器学习" open={open === 'ml'} onToggle={() => { setOpen('ml'); setNote('ml'); }} notes={['监督学习','深度学习基础']} onNote={() => setNote('ml')} />
-        <NavGroup title="神经渲染" open={open === 'rendering'} onToggle={() => { setOpen('rendering'); setNote('home'); }} notes={['NeRF：论文精读','体渲染基础','新视角合成']} active={note === 'nerf'} onNote={(i) => setNote(i === 0 ? 'nerf' : 'home')} />
+        <NavGroup title="神经渲染" open={open === 'rendering'} onToggle={() => { setOpen('rendering'); setNote('home'); }} notes={['NeRF：论文精读','3DGS：高斯泼溅','体渲染基础','新视角合成']} active={note === 'nerf' ? 0 : note === 'gs' ? 1 : -1} onNote={(i) => setNote(i === 0 ? 'nerf' : i === 1 ? 'gs' : 'home')} />
         <NavGroup title="图形学" open={open === 'graphics'} onToggle={() => { setOpen('graphics'); setNote('graphics'); }} notes={['光照与材质','几何变换','实时渲染']} onNote={() => setNote('graphics')} />
       </nav>
       <div className="side-bottom"><button className="theme-button" onClick={() => setLight(!light)}>{light ? '切换深色实验室风' : '切换浅色学术风'}</button><p>LIGHT ACADEMIC<br/>NOTE SYSTEM</p></div>
     </aside>
     <main className="content">
-      {note === 'nerf' ? <NerfPaper angle={angle} setAngle={setAngle} /> : <Placeholder title={note === 'ml' ? '机器学习' : note === 'graphics' ? '图形学' : 'WebNotes'} />}
+      {note === 'nerf' ? <NerfPaper angle={angle} setAngle={setAngle} /> : note === 'gs' ? <GaussianLab /> : <Placeholder title={note === 'ml' ? '机器学习' : note === 'graphics' ? '图形学' : 'WebNotes'} />}
     </main>
   </div>;
 }
 
-function NavGroup({ title, open, onToggle, notes, onNote, active }: {title:string;open:boolean;onToggle:()=>void;notes:string[];onNote:(i:number)=>void;active?:boolean}) { return <div className={'catalog-item '+(open ? 'open' : '')}><button className="category" onClick={onToggle}><span>{title}</span><b>{open ? '−' : '+'}</b></button>{open && <div className="notes">{notes.map((n,i) => <button key={n} className={active && i === 0 ? 'active' : ''} onClick={() => onNote(i)}>{n}</button>)}</div>}</div> }
+function NavGroup({ title, open, onToggle, notes, onNote, active }: {title:string;open:boolean;onToggle:()=>void;notes:string[];onNote:(i:number)=>void;active?:number}) { return <div className={'catalog-item '+(open ? 'open' : '')}><button className="category" onClick={onToggle}><span>{title}</span><b>{open ? '−' : '+'}</b></button>{open && <div className="notes">{notes.map((n,i) => <button key={n} className={active === i ? 'active' : ''} onClick={() => onNote(i)}>{n}</button>)}</div>}</div> }
 
 function NerfPaper({ angle, setAngle }: {angle:number;setAngle:(v:number)=>void}) { return <>
   <header className="note-head"><div><span>神经渲染 / 论文精读</span><h1>NeRF：以神经辐射场表示场景</h1><p>对 Mildenhall et al., ECCV 2020《NeRF: Representing Scenes as Neural Radiance Fields for View Synthesis》的结构化阅读笔记。</p></div><a href="https://arxiv.org/abs/2003.08934" target="_blank" rel="noreferrer">arXiv ↗</a></header>
